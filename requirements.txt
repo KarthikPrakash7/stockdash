@@ -1,0 +1,8 @@
+yfinance
+pandas
+pyarrow
+xgboost
+scikit-learn
+streamlit
+schedule
+pytest

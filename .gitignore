@@ -1,3 +1,7 @@
+# Generated data and model artifacts (MVP runs locally)
+/data/
+/models/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
