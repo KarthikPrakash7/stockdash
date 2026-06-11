@@ -5,6 +5,7 @@ import LeftPanel from './components/LeftPanel'
 import Chart from './components/Chart'
 import RightPanel from './components/RightPanel'
 import BottomTabs from './components/BottomTabs'
+import InsightsModal from './components/InsightsModal'
 
 export default function App() {
   const [tickers, setTickers] = useState([])
@@ -14,6 +15,7 @@ export default function App() {
   const [retraining, setRetraining] = useState(false)
   const [addingTicker, setAddingTicker] = useState(false)
   const [addError, setAddError] = useState(null)
+  const [showInsights, setShowInsights] = useState(false)
 
   useEffect(() => {
     fetchTickers().then(setTickers).catch(console.error)
@@ -83,7 +85,14 @@ export default function App() {
         addingTicker={addingTicker}
         addError={addError}
         onAddTicker={handleAddTicker}
+        onShowInsights={() => setShowInsights(true)}
       />
+      {showInsights && (
+        <InsightsModal
+          onClose={() => setShowInsights(false)}
+          onSelectTicker={selectTicker}
+        />
+      )}
       <div className="flex flex-col flex-1 min-h-0">
         {/* ticker info bar */}
         <div className="flex items-center gap-4 px-4 py-1 border-b border-gray-200 text-xs text-gray-600">

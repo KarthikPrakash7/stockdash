@@ -31,6 +31,12 @@ export async function addToWatchlist(ticker) {
   return res.json()
 }
 
+export async function fetchInsights() {
+  const res = await fetch(`${BASE}/insight`)
+  if (!res.ok) throw new Error('Failed to fetch insights')
+  return res.json()
+}
+
 export async function removeFromWatchlist(ticker) {
   const res = await fetch(`${BASE}/watchlist/${ticker}`, { method: 'DELETE' })
   if (!res.ok) throw new Error(`Failed to remove ${ticker}`)
