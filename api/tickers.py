@@ -1,7 +1,8 @@
 import pandas as pd
 from fastapi import APIRouter
 
-from config import DATA_RAW_DIR, WATCHLIST
+from config import DATA_RAW_DIR
+from watchlist import load_watchlist
 
 router = APIRouter()
 
@@ -23,7 +24,7 @@ def _load_ticker_summary(ticker):
 @router.get("/tickers")
 def get_tickers():
     results = []
-    for ticker in WATCHLIST:
+    for ticker in load_watchlist():
         summary = _load_ticker_summary(ticker)
         if summary:
             results.append(summary)

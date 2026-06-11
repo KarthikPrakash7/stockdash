@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchTickers, fetchChart, retrain } from './api'
+import { fetchTickers, fetchChart, retrain, addToWatchlist, removeFromWatchlist } from './api'
 import Header from './components/Header'
 import LeftPanel from './components/LeftPanel'
 import Chart from './components/Chart'
@@ -12,6 +12,8 @@ export default function App() {
   const [activeTicker, setActiveTicker] = useState('AAPL')
   const [chartData, setChartData] = useState(null)
   const [retraining, setRetraining] = useState(false)
+  const [addingTicker, setAddingTicker] = useState(false)
+  const [addError, setAddError] = useState(null)
 
   useEffect(() => {
     fetchTickers().then(setTickers).catch(console.error)
@@ -49,6 +51,26 @@ export default function App() {
     }
   }
 
+  async function handleAddTicker(ticker) {
+    setAddingTicker(true)
+    setAddError(null)
+    try {
+      const result = await addToWatchlist(ticker)
+      setTickers(await fetchTickers())
+      selectTicker(result.ticker)
+    } catch (err) {
+      setAddError(err.message)
+    } finally {
+      setAddingTicker(false)
+    }
+  }
+
+  async function handleRemoveTicker(ticker) {
+    await removeFromWatchlist(ticker).catch(console.error)
+    setTickers(await fetchTickers())
+    if (openTabs.includes(ticker)) closeTab(ticker)
+  }
+
   const activeTickerSummary = tickers.find(t => t.ticker === activeTicker)
 
   return (
@@ -58,6 +80,9 @@ export default function App() {
         summary={activeTickerSummary}
         retraining={retraining}
         onRetrain={handleRetrain}
+        addingTicker={addingTicker}
+        addError={addError}
+        onAddTicker={handleAddTicker}
       />
       <div className="flex flex-col flex-1 min-h-0">
         {/* ticker info bar */}
@@ -95,6 +120,7 @@ export default function App() {
             activeTicker={activeTicker}
             chartData={chartData}
             onSelectTicker={selectTicker}
+            onRemoveTicker={handleRemoveTicker}
           />
         </div>
       </div>

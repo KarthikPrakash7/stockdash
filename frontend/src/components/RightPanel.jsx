@@ -14,7 +14,7 @@ function calcRMSE(predictions) {
   return Math.sqrt(predictions.reduce((s, p) => s + (p.actual - p.predicted) ** 2, 0) / predictions.length)
 }
 
-export default function RightPanel({ tickers, activeTicker, chartData, onSelectTicker }) {
+export default function RightPanel({ tickers, activeTicker, chartData, onSelectTicker, onRemoveTicker }) {
   const [tab, setTab] = useState('Watchlist')
   const summary = tickers.find(t => t.ticker === activeTicker)
   const mae = calcMAE(chartData?.predictions)
@@ -42,10 +42,10 @@ export default function RightPanel({ tickers, activeTicker, chartData, onSelectT
       {/* tab content */}
       <div className="flex-1 overflow-y-auto">
         {tab === 'Watchlist' && tickers.map(t => (
-          <button
+          <div
             key={t.ticker}
             onClick={() => onSelectTicker(t.ticker)}
-            className={`w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 transition-colors ${
+            className={`group w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 transition-colors cursor-pointer ${
               activeTicker === t.ticker ? 'bg-gray-50' : ''
             }`}
           >
@@ -56,13 +56,22 @@ export default function RightPanel({ tickers, activeTicker, chartData, onSelectT
               />
               <span className="text-xs font-semibold text-gray-800">{t.ticker}</span>
             </div>
-            <div className="text-right">
-              <div className="text-xs font-semibold text-gray-900 tabular-nums">{t.price.toFixed(2)}</div>
-              <div className={`text-xs tabular-nums ${t.change_pct >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                {t.change_pct >= 0 ? '+' : ''}{t.change_pct.toFixed(1)}%
+            <div className="flex items-center gap-1.5">
+              <div className="text-right">
+                <div className="text-xs font-semibold text-gray-900 tabular-nums">{t.price.toFixed(2)}</div>
+                <div className={`text-xs tabular-nums ${t.change_pct >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                  {t.change_pct >= 0 ? '+' : ''}{t.change_pct.toFixed(1)}%
+                </div>
               </div>
+              <button
+                onClick={e => { e.stopPropagation(); onRemoveTicker(t.ticker) }}
+                title={`Remove ${t.ticker}`}
+                className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 text-xs px-0.5 transition-opacity"
+              >
+                ✕
+              </button>
             </div>
-          </button>
+          </div>
         ))}
         {tab !== 'Watchlist' && (
           <p className="p-4 text-xs text-gray-400">Coming in a future milestone.</p>

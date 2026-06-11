@@ -2,7 +2,8 @@ import logging
 
 import yfinance as yf
 
-from config import DATA_RAW_DIR, WATCHLIST
+from config import DATA_RAW_DIR
+from watchlist import load_watchlist
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,9 @@ def save_raw(ticker, df):
     df.to_parquet(DATA_RAW_DIR / f"{ticker}.parquet")
 
 
-def fetch_all(watchlist=WATCHLIST):
+def fetch_all(watchlist=None):
+    if watchlist is None:
+        watchlist = load_watchlist()
     fetched = []
     for ticker in watchlist:
         df = fetch_ticker(ticker)

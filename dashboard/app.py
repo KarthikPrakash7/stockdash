@@ -4,14 +4,15 @@ import pandas as pd
 import streamlit as st
 import xgboost as xgb
 
-from config import DATA_PROCESSED_DIR, HOLDOUT_DAYS, MODELS_DIR, WATCHLIST
+from config import DATA_PROCESSED_DIR, HOLDOUT_DAYS, MODELS_DIR
 from training.scheduler import run_pipeline_once
 from training.train import FEATURE_COLUMNS, TARGET_COLUMN, split_train_holdout
+from watchlist import load_watchlist
 
 st.set_page_config(page_title="Self-Learning Stock Dashboard", layout="wide")
 st.title("Self-Learning Stock Dashboard")
 
-ticker = st.sidebar.selectbox("Ticker", WATCHLIST)
+ticker = st.sidebar.selectbox("Ticker", load_watchlist())
 
 if st.sidebar.button("Retrain now"):
     with st.spinner("Fetching data and retraining all tickers..."):

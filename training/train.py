@@ -13,8 +13,8 @@ from config import (
     MLFLOW_EXPERIMENT,
     MLFLOW_TRACKING_URI,
     MODELS_DIR,
-    WATCHLIST,
 )
+from watchlist import load_watchlist
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +106,9 @@ def train_ticker(ticker):
     return metrics
 
 
-def train_all(watchlist=WATCHLIST):
+def train_all(watchlist=None):
+    if watchlist is None:
+        watchlist = load_watchlist()
     results = {}
     for ticker in watchlist:
         metrics = train_ticker(ticker)

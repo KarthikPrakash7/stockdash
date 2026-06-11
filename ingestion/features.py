@@ -2,7 +2,8 @@ import logging
 
 import pandas as pd
 
-from config import DATA_PROCESSED_DIR, DATA_RAW_DIR, WATCHLIST
+from config import DATA_PROCESSED_DIR, DATA_RAW_DIR
+from watchlist import load_watchlist
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,9 @@ def process_ticker(ticker):
     return processed
 
 
-def process_all(watchlist=WATCHLIST):
+def process_all(watchlist=None):
+    if watchlist is None:
+        watchlist = load_watchlist()
     processed = []
     for ticker in watchlist:
         result = process_ticker(ticker)

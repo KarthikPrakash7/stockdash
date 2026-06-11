@@ -17,3 +17,22 @@ export async function retrain() {
   if (!res.ok) throw new Error('Retrain failed')
   return res.json()
 }
+
+export async function addToWatchlist(ticker) {
+  const res = await fetch(`${BASE}/watchlist`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ticker }),
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.detail ?? `Failed to add ${ticker}`)
+  }
+  return res.json()
+}
+
+export async function removeFromWatchlist(ticker) {
+  const res = await fetch(`${BASE}/watchlist/${ticker}`, { method: 'DELETE' })
+  if (!res.ok) throw new Error(`Failed to remove ${ticker}`)
+  return res.json()
+}

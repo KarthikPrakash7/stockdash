@@ -1,4 +1,16 @@
-export default function Header({ ticker, summary, retraining, onRetrain }) {
+import { useState } from 'react'
+
+export default function Header({ ticker, summary, retraining, onRetrain, addingTicker, addError, onAddTicker }) {
+  const [query, setQuery] = useState('')
+
+  function submit(e) {
+    e.preventDefault()
+    const value = query.trim()
+    if (!value || addingTicker) return
+    onAddTicker(value)
+    setQuery('')
+  }
+
   return (
     <header className="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-white">
       {/* logo */}
@@ -9,13 +21,32 @@ export default function Header({ ticker, summary, retraining, onRetrain }) {
         <span className="font-semibold text-gray-900 text-sm">StockDash</span>
       </div>
 
-      {/* search */}
-      <div className="flex items-center gap-2 border border-gray-200 rounded px-2.5 py-1 text-gray-400 text-xs w-44 mx-6">
-        <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <span>Search ticker...</span>
-      </div>
+      {/* add ticker */}
+      <form
+        onSubmit={submit}
+        className={`flex items-center gap-2 border rounded px-2.5 py-1 text-xs w-52 mx-6 ${
+          addError ? 'border-red-300' : 'border-gray-200'
+        }`}
+      >
+        {addingTicker ? (
+          <svg className="w-3 h-3 flex-shrink-0 animate-spin text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        ) : (
+          <svg className="w-3 h-3 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        )}
+        <input
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          disabled={addingTicker}
+          placeholder={addError ?? (addingTicker ? 'Adding & training...' : 'Add ticker...')}
+          className={`flex-1 min-w-0 outline-none bg-transparent ${
+            addError ? 'placeholder-red-400' : 'placeholder-gray-400'
+          } text-gray-800`}
+        />
+      </form>
 
       {/* ticker summary */}
       <div className="flex items-center gap-3 flex-1 justify-end mr-4">
