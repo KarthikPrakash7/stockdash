@@ -8,6 +8,20 @@ def test_score_headline_positive_and_negative():
     assert news.score_headline("terrible loss shocks market") < 0
 
 
+def test_score_headline_knows_finance_jargon():
+    assert news.score_headline("stock soars after earnings") > 0
+    assert news.score_headline("profit beats expectations") > 0
+    assert news.score_headline("analysts upgraded the stock") > 0
+    assert news.score_headline("shares plunge on weak guidance") < 0
+    assert news.score_headline("analyst downgrades hit the stock") < 0
+    assert news.score_headline("company misses revenue estimates") < 0
+
+
+def test_finance_lexicon_outweighs_generic_reading():
+    # 'beat' is negative (violence) in stock VADER; finance sense is positive
+    assert news.score_headline("company beat estimates") > 0
+
+
 def test_normalize_items_handles_nested_content_format():
     items = [
         {

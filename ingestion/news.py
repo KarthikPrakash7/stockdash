@@ -9,7 +9,44 @@ from watchlist import load_watchlist
 
 logger = logging.getLogger(__name__)
 
+# VADER's general-purpose lexicon misses (or misreads) finance vocabulary —
+# e.g. 'beat' scores as violence. Valence scale is -4..+4 like the stock lexicon.
+FINANCE_LEXICON = {
+    "soar": 2.9, "soars": 2.9, "soared": 2.9, "soaring": 2.9,
+    "surge": 2.6, "surges": 2.6, "surged": 2.6, "surging": 2.6,
+    "rally": 2.2, "rallies": 2.2, "rallied": 2.2,
+    "rebound": 1.8, "rebounds": 1.8, "rebounded": 1.8,
+    "jump": 1.8, "jumps": 1.8, "jumped": 1.8,
+    "climb": 1.5, "climbs": 1.5, "climbed": 1.5,
+    "outperform": 2.0, "outperforms": 2.0, "outperformed": 2.0,
+    "upgrade": 2.0, "upgrades": 2.0, "upgraded": 2.0,
+    "bullish": 2.5,
+    "breakout": 1.8,
+    "beat": 1.5, "beats": 1.5,
+    "buyback": 1.5, "buybacks": 1.5,
+    "overweight": 1.5,
+    "plunge": -2.9, "plunges": -2.9, "plunged": -2.9, "plunging": -2.9,
+    "tumble": -2.5, "tumbles": -2.5, "tumbled": -2.5,
+    "slump": -2.3, "slumps": -2.3, "slumped": -2.3,
+    "sink": -2.0, "sinks": -2.0, "sank": -2.0,
+    "slide": -1.8, "slides": -1.8, "slid": -1.8,
+    "drop": -1.5, "drops": -1.5, "dropped": -1.5,
+    "fall": -1.4, "falls": -1.4, "fell": -1.4,
+    "downgrade": -2.0, "downgrades": -2.0, "downgraded": -2.0,
+    "bearish": -2.5,
+    "selloff": -2.4, "sell-off": -2.4,
+    "miss": -1.8, "misses": -1.8, "missed": -1.8,
+    "shortfall": -2.0,
+    "layoff": -2.0, "layoffs": -2.0,
+    "bankruptcy": -3.4,
+    "lawsuit": -1.8, "probe": -1.5, "investigation": -1.5,
+    "recall": -1.8, "recalls": -1.8,
+    "warns": -1.6, "warned": -1.6, "warning": -1.6,
+    "underweight": -1.5,
+}
+
 _analyzer = SentimentIntensityAnalyzer()
+_analyzer.lexicon.update(FINANCE_LEXICON)
 
 
 def score_headline(title):
