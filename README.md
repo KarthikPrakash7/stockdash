@@ -4,7 +4,7 @@ A self-retraining stock-prediction dashboard, built as an MLOps/platform-enginee
 project. It runs a daily ingest → feature-engineering → train pipeline on a small watchlist of
 tickers, serves predictions via a FastAPI backend, and renders them in a React trading-terminal UI.
 
-![StockDash dashboard](docs/assets/dashboard.png)
+![StockDash dashboard](assets/dashboard.png)
 
 ## Features
 
@@ -92,17 +92,3 @@ npm run dev
 ```bash
 .venv/bin/pytest -v
 ```
-
-## Roadmap
-
-This project is built incrementally as a series of milestones (see `docs/superpowers/specs/`):
-
-- [x] Milestone 1 — local pipeline + dashboard MVP
-- [x] Milestone 2 — React trading-terminal UI + FastAPI backend
-- [x] Milestone 3 — Docker / docker-compose
-- [ ] CI/CD pipeline
-- [ ] MLflow / W&B experiment tracking
-- [ ] Kubernetes + Helm deployment
-- [ ] Terraform / cloud storage
-- [ ] GitOps (ArgoCD/Flux)
-- [ ] Prometheus / Grafana observability
