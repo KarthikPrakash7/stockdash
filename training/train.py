@@ -2,13 +2,23 @@ import json
 import logging
 import time
 
+import mlflow
 import pandas as pd
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-from config import DATA_PROCESSED_DIR, HOLDOUT_DAYS, MODELS_DIR, WATCHLIST
+from config import (
+    DATA_PROCESSED_DIR,
+    HOLDOUT_DAYS,
+    MLFLOW_EXPERIMENT,
+    MLFLOW_TRACKING_URI,
+    MODELS_DIR,
+    WATCHLIST,
+)
 
 logger = logging.getLogger(__name__)
+
+MODEL_PARAMS = {"n_estimators": 200, "max_depth": 4, "learning_rate": 0.05}
 
 FEATURE_COLUMNS = [
     "close",
@@ -32,9 +42,24 @@ def split_train_holdout(df, holdout_days=HOLDOUT_DAYS):
 
 
 def train_model(train_df):
-    model = xgb.XGBRegressor(n_estimators=200, max_depth=4, learning_rate=0.05)
+    model = xgb.XGBRegressor(**MODEL_PARAMS)
     model.fit(train_df[FEATURE_COLUMNS], train_df[TARGET_COLUMN])
     return model
+
+
+def log_training_run(ticker, metrics, params, artifacts=()):
+    try:
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        mlflow.set_experiment(MLFLOW_EXPERIMENT)
+        with mlflow.start_run(run_name=ticker):
+            mlflow.set_tag("ticker", ticker)
+            mlflow.log_params(params)
+            mlflow.log_metrics(metrics)
+            for artifact in artifacts:
+                mlflow.log_artifact(str(artifact))
+    except Exception:
+        # tracking is best-effort: a dead server must never break the pipeline
+        logger.exception("mlflow logging failed for %s", ticker)
 
 
 def evaluate(model, holdout_df):
@@ -66,6 +91,18 @@ def train_ticker(ticker):
     model = train_model(train_df)
     metrics = evaluate(model, holdout_df)
     save_model(ticker, model, metrics)
+    ticker_dir = MODELS_DIR / ticker
+    log_training_run(
+        ticker,
+        metrics=metrics,
+        params={
+            **MODEL_PARAMS,
+            "holdout_days": HOLDOUT_DAYS,
+            "train_rows": len(train_df),
+            "holdout_rows": len(holdout_df),
+        },
+        artifacts=[ticker_dir / "model.json", ticker_dir / "metrics.json"],
+    )
     return metrics
 
 

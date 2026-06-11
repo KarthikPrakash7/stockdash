@@ -1,5 +1,7 @@
 # StockDash
 
+[![CI](https://github.com/KarthikPrakash7/stock-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/KarthikPrakash7/stock-portfolio/actions/workflows/ci.yml)
+
 A self-retraining stock-prediction dashboard, built as an MLOps/platform-engineering portfolio
 project. It runs a daily ingest → feature-engineering → train pipeline on a small watchlist of
 tickers, serves predictions via a FastAPI backend, and renders them in a React trading-terminal UI.
@@ -16,7 +18,12 @@ tickers, serves predictions via a FastAPI backend, and renders them in a React t
   a predicted-price line over the holdout window, a watchlist with live prices, and per-ticker
   model metrics (MAE/RMSE, predicted next close).
 - **FastAPI backend** — thin JSON layer over the pipeline's parquet/model artifacts.
-- **Dockerized** — `docker-compose up` runs the API, frontend, and retrain scheduler together.
+- **Dockerized** — `docker-compose up` runs the API, frontend, retrain scheduler, and MLflow
+  tracking server together.
+- **Experiment tracking** — every training run logs hyperparameters, MAE/RMSE, and model
+  artifacts to MLflow (per-ticker runs in a `stock-portfolio` experiment).
+- **CI/CD** — GitHub Actions runs the test suite and frontend build on every push/PR, then
+  builds and publishes Docker images to GHCR on `main`.
 
 ## Architecture
 
@@ -45,6 +52,7 @@ docker compose up -d --build
 
 - Dashboard: http://localhost:3000
 - API: http://localhost:8000/api/tickers
+- MLflow UI: http://localhost:5000
 
 The `scheduler` service runs the full pipeline once on startup (fetch + features + train for
 every ticker), then daily after that. `data/` and `models/` are bind-mounted to the host, so
@@ -78,6 +86,13 @@ npm run dev
 
 - Dashboard: http://localhost:5173
 - API: http://localhost:8000
+
+Training runs log to a local sqlite store (`mlflow.db`) by default; point `MLFLOW_TRACKING_URI`
+at a server to log remotely. To browse local runs:
+
+```bash
+mlflow ui --backend-store-uri sqlite:///mlflow.db
+```
 
 ## API
 
