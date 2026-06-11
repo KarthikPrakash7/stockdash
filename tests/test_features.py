@@ -37,3 +37,30 @@ def test_build_features_drops_rows_with_nans():
     result = features.build_features(raw)
 
     assert not result.isna().any().any()
+
+
+def test_build_features_without_news_fills_sentiment_with_zeros():
+    raw = _make_raw(30)
+
+    result = features.build_features(raw)
+
+    assert (result["sent_1d"] == 0).all()
+    assert (result["sent_mean_7d"] == 0).all()
+    assert (result["news_count_7d"] == 0).all()
+
+
+def test_build_features_merges_daily_news_sentiment():
+    raw = _make_raw(30)
+    news_daily = pd.DataFrame(
+        {"sent_mean": [0.5, -0.2], "news_count": [2.0, 1.0]},
+        index=["2024-01-25", "2024-01-26"],
+    )
+
+    result = features.build_features(raw, news_daily=news_daily)
+
+    assert result.loc["2024-01-25", "sent_1d"] == 0.5
+    assert result.loc["2024-01-26", "sent_1d"] == -0.2
+    assert result.loc["2024-01-24", "sent_1d"] == 0.0
+    # rolling 7-day window picks up both news days
+    assert result.loc["2024-01-26", "news_count_7d"] == 3.0
+    assert result.loc["2024-01-26", "sent_mean_7d"] == pytest.approx((0.5 - 0.2) / 7)

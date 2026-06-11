@@ -35,6 +35,9 @@ def test_get_chart_response_keys(monkeypatch):
         "ma_5": proc_closes,
         "ma_10": proc_closes,
         "ma_20": proc_closes,
+        "sent_1d": [0.0] * 61,
+        "sent_mean_7d": [0.0] * 61,
+        "news_count_7d": [0.0] * 61,
         "target_next_close": closes[20:] + [0.0],
     }, index=proc_idx)
 

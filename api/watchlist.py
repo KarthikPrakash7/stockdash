@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import watchlist as wl
 from ingestion.fetch import fetch_ticker, save_raw
 from ingestion.features import process_ticker
+from ingestion.news import collect_news
 from training.train import train_ticker
 
 router = APIRouter()
@@ -31,6 +32,7 @@ def add_to_watchlist(req: TickerRequest):
         raise HTTPException(status_code=404, detail=f"no data found for {ticker}")
 
     save_raw(ticker, df)
+    collect_news(ticker)
     process_ticker(ticker)
     metrics = train_ticker(ticker)
     wl.add_ticker(ticker)

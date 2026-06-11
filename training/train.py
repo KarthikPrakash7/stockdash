@@ -31,6 +31,9 @@ FEATURE_COLUMNS = [
     "ma_5",
     "ma_10",
     "ma_20",
+    "sent_1d",
+    "sent_mean_7d",
+    "news_count_7d",
 ]
 TARGET_COLUMN = "target_next_close"
 
