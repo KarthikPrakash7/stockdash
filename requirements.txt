@@ -6,3 +6,6 @@ scikit-learn
 streamlit
 schedule
 pytest
+fastapi
+uvicorn[standard]
+httpx
