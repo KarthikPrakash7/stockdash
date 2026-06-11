@@ -8,7 +8,8 @@ export default function Chart({ chartData }) {
 
   useEffect(() => {
     const chart = createChart(containerRef.current, {
-      layout: { background: { color: '#ffffff' }, textColor: '#374151' },
+      // TradingView attribution kept in README per lightweight-charts license
+      layout: { background: { color: '#ffffff' }, textColor: '#374151', attributionLogo: false },
       grid: { vertLines: { color: '#f3f4f6' }, horzLines: { color: '#f3f4f6' } },
       crosshair: { mode: CrosshairMode.Normal },
       rightPriceScale: { borderColor: '#e5e7eb' },
